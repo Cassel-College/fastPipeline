@@ -28,7 +28,7 @@ class IOTools():
         else:
             return True
         
-    def create_target_folder(self, target_folder_path: str) -> int:
+    def create_target_folder(self, target_folder_path: str) -> dict:
         """
         创建目标文件夹
 
@@ -36,20 +36,27 @@ class IOTools():
         :return: 0: 创建成功; 1: 创建失败; -1: 目标文件夹已存在
         """
         return_value  = 1
-
+        massage = f"create target file path: {target_folder_path}"
         # 如果目标文件夹存在,返回错误
         if self.check_target_folder_exist(target_folder_path=target_folder_path):
             return_value = -1
+            massage += f", target file already exists!"
         else:
             os.makedirs(target_folder_path)
             if self.check_target_folder_exist(target_folder_path=target_folder_path):
                 return_value = 0
+                massage += f", create success!"
             else:
                 return_value = 1
-        return return_value
+                massage += f", create failed!"
+        return_info = {
+            "return_value": return_value,
+            "massage": massage
+        }
+        return return_info
     
 
-    def create_target_file(self, target_file_path: str) -> int:
+    def create_target_file(self, target_file_path: str) -> dict:
         """
         创建目标文件
 
@@ -57,17 +64,21 @@ class IOTools():
         :return: 0: 创建成功; 1: 创建失败; -1: 目标文件已存在
         """
         return_value  = 1
-
+        massage = f"create target file path: {target_file_path}"
         # 如果目标文件存在,返回错误
         if os.path.exists(target_file_path):
             return_value = -1
+            massage += f", target file already exists!"
         else:
             open(target_file_path, 'w').close()
             if os.path.exists(target_file_path):
                 return_value = 0
+                massage += f", create success!"
             else:
                 return_value = 1
-        return return_value
-        
-
-        
+                massage += f", create failed!"
+        return_info = {
+            "return_value": return_value,
+            "massage": massage
+        }
+        return return_info
