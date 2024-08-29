@@ -3,5 +3,6 @@
     "source_folder_path": "/Users/pengliu/Code/fastPipeline/source",
     "input_file_name": "input.json",
     "output_file_name": "output.json",
-    "step_log_file_name": "log.txt"
+    "step_log_file_name": "log.txt",
+    "script_engine": "python3"
 }

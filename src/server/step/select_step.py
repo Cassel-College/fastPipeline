@@ -2,6 +2,7 @@
 import os
 import sys
 
+from src.model.step import Step
 from src.tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 # import os
@@ -18,25 +19,23 @@ from starlette.requests import Request
 
 router = APIRouter()
 
-def select_all_task_name_core() -> list:
 
-    config = ConfigTools()
-    source_folder_path = config.get_source_folder_path()
-    folder_names = IOTools().get_folder_names_from_path(source_folder_path)
-    return folder_names
-
-@router.post("/select_step_base_info")
+@router.post("/select_task_all_step_name")
 def select_all_task_name_server(request: Request):
 
-    task_name = ""
-    step_name = ""
-    pass
+    task_name = "test001"
+    step_name = "step001"
+    step = Step(task_name, step_name)
+    step_base_info = step.get_step_base_info()
+    return JSONResponse(content=step_base_info)
     
-    
-    
-@router.post("/select_all_step_name")
+
+# @router.post("/select_all_step_name")
+@router.post("/select_step_full_info")
 def select_all_task_name_server(request: Request):
 
-    task_name = ""
-    get_all_step_name
-
+    task_name = "test001"
+    step_name = "index001"
+    step = Step(task_name, step_name)
+    step_full_info = step.get_step_full_info()
+    return JSONResponse(content=step_full_info)

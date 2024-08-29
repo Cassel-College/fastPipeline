@@ -8,6 +8,7 @@ from fastapi import FastAPI, Depends, HTTPException
 
 from src.server.task import select_task 
 from src.server.task import create_task
+from src.server.task import exec_task
 from src.server.step import create_step
 from src.server.step import select_step
 from src.tools.config_tools import ConfigTools
@@ -18,6 +19,7 @@ app = FastAPI()
 
 app.include_router(select_task.router, prefix="/api/v1/task")
 app.include_router(create_task.router, prefix="/api/v1/task")
+app.include_router(exec_task.router, prefix="/api/v1/task")
 app.include_router(create_step.router, prefix="/api/v1/step")
 app.include_router(select_step.router, prefix="/api/v1/step")
 

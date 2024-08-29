@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-
+import json
 
 class IOTools():
 
@@ -37,6 +37,7 @@ class IOTools():
         """
         return_value  = 1
         massage = f"create target file path: {target_folder_path}"
+        print(massage)
         # 如果目标文件夹存在,返回错误
         if self.check_target_folder_exist(target_folder_path=target_folder_path):
             return_value = -1
@@ -82,3 +83,33 @@ class IOTools():
             "massage": massage
         }
         return return_info
+
+
+    def read_json_from_file(self, file_path: str) -> dict:
+        """
+        读取json文件
+
+        :param file_path: 文件路径
+        :return: 0: 读取成功; 1: 读取失败; -1: 文件不存在
+        """
+        
+        return_results = {}
+        return_code = 1
+        return_value = {}
+        if not os.path.exists(file_path):
+            return_code = -1
+        else:
+            with open(file_path, 'r') as file:
+                return_code = 0
+                return_value = json.load(file)
+        return_results = {
+            "return_code": return_code,
+            "return_value": return_value
+        }
+        return return_results
+    
+    def check_file_exist(self, file_path: str) -> bool:
+        if not os.path.exists(file_path):
+            return False
+        else:
+            return True
