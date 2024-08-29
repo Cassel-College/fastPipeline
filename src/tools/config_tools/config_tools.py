@@ -59,5 +59,12 @@ class ConfigTools(object):
         
         return self.config_dict.get("step_log_file_name", "")
     
+    def get_script_engine(self) -> str:
+
+        if self.config_dict is None:
+            self.config_dict = self.get_config()
+        
+        return self.config_dict.get("script_engine", "")
+    
 
 

@@ -29,13 +29,13 @@ router = APIRouter()
 @router.post("/create")
 def create(request: Request):
 
-    task_name = "test001"
+    task_name = "test004"
     config = ConfigTools()
     source_folder_path = config.get_source_folder_path()
     all_task_names = select_all_task_name_core()
     log_info = f"all task names: {all_task_names}"
     print(log_info)
-    resout = 1 # 0: success, 1: failed
+    resout_code = 1 # 0: success, 1: failed
     if task_name in all_task_names:
         log_info = f"task name: {task_name} already exists!"
         print(log_info)
@@ -45,5 +45,19 @@ def create(request: Request):
         io_tools = IOTools()
         task_dir = os.path.join(source_folder_path, task_name)
         resout = io_tools.create_target_folder(task_dir)
-    return {"message": log_info, "resout": resout}
+        resout_code = resout.get("return_value", 1)
+        if resout_code == 0:
+            log_info = f"create task folder success!"
+            task_index_json_file = os.path.join(source_folder_path, task_name, "task_index.json")
+            resout = io_tools.create_target_file(task_index_json_file)
+            resout_code = resout.get("return_value", 1)
+            if resout_code == 0:
+                log_info = f"create task index json file success!"
+            else:
+                log_info = f"create task index json file failed!"
+            print(log_info)
+        else:
+            log_info = f"create task folder failed!"
+            print(log_info)
+    return {"message": log_info, "resout": resout_code}
 
