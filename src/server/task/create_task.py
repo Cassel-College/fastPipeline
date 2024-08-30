@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
 # import tools
+from src.model.task import Task
 from src.tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 
@@ -30,6 +31,8 @@ router = APIRouter()
 def create(request: Request):
 
     task_name = "test004"
+    task = Task(task_name)
+    create_readme_results = task.create_readme()
     config = ConfigTools()
     source_folder_path = config.get_source_folder_path()
     all_task_names = select_all_task_name_core()

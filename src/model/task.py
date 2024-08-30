@@ -9,6 +9,7 @@ class Task:
     
     def __init__(self, task_name: str):
         self.task_name = task_name
+        self.readme_path = ""
         self.config = ConfigTools()
         
         
@@ -84,6 +85,8 @@ class Task:
         print(log_info)
         task_index_path = self.get_task_index_path()
         task_index = IOTools().read_json_from_file(task_index_path)
+        log_info = f"get task_index: {task_index}, from read json file: {task_index_path}."
+        print(log_info)
         if task_index.get("return_code", 1) == 0:
             step_index = task_index.get("return_value", {})
             log_info = f"Get task index info of {self.task_name} success."
@@ -100,6 +103,7 @@ class Task:
         log_info = f"Get task index of step name of {self.task_name}."
         print(log_info)
         indexs_numbers = task_index_info.keys()
+        print("indexs_numbers", indexs_numbers)
         indexs_numbers = sorted(indexs_numbers, key=lambda x: int(x))
         indexs = [task_index_info[index] for index in indexs_numbers]
         log_info = f"Get task index of step name of {self.task_name} success, indexs: {indexs}."
@@ -126,6 +130,7 @@ class Task:
         # check task info efficiency
         return_results = {
             "task_name": self.task_name,
+            "readme_path": self.gen_readme_path(),
             "task_full_info": task_full_info,
             "step_index": indexs,
             "task_efficincy": task_efficincy,
@@ -135,6 +140,26 @@ class Task:
         return_results["return_value"] = 1
         return return_results
     
+    def gen_readme_path(self) -> str:
+        
+        task_path = os.path.join(self.config.get_source_folder_path(), self.task_name)
+        readme_md_path = os.path.join(task_path, "README.md")
+        return readme_md_path
+    
+    def create_readme(self) -> dict:
+        """
+        创建README文件夹和README.md文件
+        """
+        return_results = {
+            "code": 1,
+            "message": ""
+        }
+        readme_md_path = self.gen_readme_path()
+        if not IOTools().check_target_file_exist(readme_md_path):
+            IOTools().create_file(readme_md_path)
+        return_results["code"] = 0
+        return_results["message"] = "Create README success."
+        return return_results
     
     def get_step_base_names(self) -> dict:
         
