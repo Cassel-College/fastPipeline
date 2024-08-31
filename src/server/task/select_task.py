@@ -26,16 +26,22 @@ def select_all_task_name_core() -> list:
     config = ConfigTools()
     source_folder_path = config.get_source_folder_path()
     folder_names = IOTools().get_folder_names_from_path(source_folder_path)
-    return folder_names
+    return_results = {
+        "statusCode": 200,
+        "massage": "get task names success",
+        "data": folder_names,
+        "responseText": folder_names
+    }
+    return return_results
 
-@router.post("/select_all_task_name")
+@router.get("/select_all_task_name")
 def select_all_task_name_server(request: Request):
 
     folder_names = select_all_task_name_core()
     return JSONResponse(content=folder_names)
 
 
-@router.post("/select_by_task_name")
+@router.get("/select_full_info_by_task_name")
 def select_all_task_name_server(request: Request):
 
     task_name = "test001"
@@ -46,18 +52,21 @@ def select_all_task_name_server(request: Request):
         task_full_info = task.get_task_full_info()
         if task_full_info.get("return_value", 0) == 0:
             return_results = {
-                "return_value": 1,
-                "task_full_info": task_full_info,
+                "code": 1,
+                "massage": "get task full info success",
+                "data": task_full_info,
             }
         else:
             return_results = {
-                "return_value": 0,
-                "task_full_info": task_full_info
+                "code": 0,
+                "massage": "get task full info failed",
+                "data": task_full_info
             }
     else:
         return_results = {
-            "return_value": 0,
-            "task_full_info": task_full_info
+            "code": 0,
+            "massage": "task not exist",
+            "data": task_full_info
         }
     return JSONResponse(content=return_results)
 

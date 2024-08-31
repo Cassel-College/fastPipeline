@@ -2,6 +2,7 @@
 
 from typing import Union
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 # from starlette.middleware.sessions import SessionMiddleware
 # from starlette.requests import Request
 
@@ -17,6 +18,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有源，生产环境中应该更具体
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+   
 app.include_router(select_task.router, prefix="/api/v1/task")
 app.include_router(create_task.router, prefix="/api/v1/task")
 app.include_router(exec_task.router, prefix="/api/v1/task")
