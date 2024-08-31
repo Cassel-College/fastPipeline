@@ -1,6 +1,6 @@
 {
-    "log_folder_path": "/Users/pengliu/Code/fastPipeline/logs",
-    "source_folder_path": "/Users/pengliu/Code/fastPipeline/source",
+    "log_folder_path": "logs",
+    "source_folder_path": "source",
     "input_file_name": "input.json",
     "output_file_name": "output.json",
     "step_log_file_name": "log.txt",

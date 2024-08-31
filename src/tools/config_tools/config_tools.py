@@ -11,7 +11,6 @@ class ConfigTools(object):
         self.config_file_path = os.path.join(self.exec_root_path, "src/config.json")
         self.config_dict = None
 
-
     def get_config(self) -> dict:
         
         config = {}
@@ -28,15 +27,15 @@ class ConfigTools(object):
 
         if self.config_dict is None:
             self.config_dict = self.get_config()
-        
-        return self.config_dict.get("log_folder_path", "")
+        log_folder_path = os.path.join(self.exec_root_path, self.config_dict.get("log_folder_path", ""))
+        return log_folder_path
     
     def get_source_folder_path(self) -> str:
 
         if self.config_dict is None:
             self.config_dict = self.get_config()
-        
-        return self.config_dict.get("source_folder_path", "")
+        source_folder_path = os.path.join(self.exec_root_path, self.config_dict.get("source_folder_path", ""))
+        return source_folder_path
     
     def get_input_file_name(self) -> str:
 
@@ -65,6 +64,3 @@ class ConfigTools(object):
             self.config_dict = self.get_config()
         
         return self.config_dict.get("script_engine", "")
-    
-
-
