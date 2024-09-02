@@ -1,1 +1,1 @@
-docker build -t fast_pipeline_server .
+docker build --no-cache -t fast_pipeline_server .

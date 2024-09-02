@@ -1,6 +1,7 @@
 import os
 
 
+from src.model.return_info import ReturnInfo
 from src.tools.config_tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 from src.model.step import Step
@@ -10,8 +11,12 @@ class Task:
     def __init__(self, task_name: str):
         self.task_name = task_name
         self.readme_path = ""
+        self.paramater_path = ""
+        self.log_path = ""
         self.config = ConfigTools()
-        
+    
+    def init_for_create(self):
+        pass
         
     def get_all_step_name(self) -> dict:
         
@@ -109,8 +114,54 @@ class Task:
         log_info = f"Get task index of step name of {self.task_name} success, indexs: {indexs}."
         print(log_info)
         return indexs
+    
+    def gen_readme_path(self) -> str:
+        
+        task_path = os.path.join(self.config.get_source_folder_path(), self.task_name)
+        readme_md_path = os.path.join(task_path, "README.md")
+        return readme_md_path
+    
+    def gen_paramater_path(self) -> str:
+        
+        task_path = os.path.join(self.config.get_source_folder_path(), self.task_name)
+        paramater_path = os.path.join(task_path, "paramater.json")
+        return paramater_path
+    
+    def create_readme(self) -> dict:
+        """
+        创建README文件夹和README.md文件
+        """
+        return_results = ReturnInfo(code=1, message="", data=None)
+        readme_md_path = self.gen_readme_path()
+        if not IOTools().check_file_exist(readme_md_path):
+            IOTools().create_target_file(readme_md_path)
+        return_results.code = 0
+        return_results.message = "Create README success."
+        return return_results
+    
+    def create_paramater(self) -> dict:
+        """
+        创建paramater.json文件
+        """
+        return_results = ReturnInfo(code=1, message="", data=None)
+        paramater_path = self.gen_paramater_path()
+        if not IOTools().check_file_exist(paramater_path):
+            IOTools().create_target_file(paramater_path)
+        return_results.code = 0
+        return_results.message = "Create paramater success."
+        return return_results
         
         
+    def get_step_base_names(self) -> dict:
+        
+        config = ConfigTools()
+        source_folder_path = config.get_source_folder_path()
+        task_path = os.path.join(source_folder_path, self.task_name)
+        folder_names = IOTools().get_folder_names_from_path(task_path)
+        return_results = ReturnInfo(code=1, message="", data=folder_names)
+        return return_results
+    
+    
     def get_task_full_info(self) -> dict:
         
         return_value = 0
@@ -138,39 +189,6 @@ class Task:
         }
         return_results["task_efficincy"] = self.check_task_efficincy(return_results)
         return_results["return_value"] = 1
-        return return_results
-    
-    def gen_readme_path(self) -> str:
-        
-        task_path = os.path.join(self.config.get_source_folder_path(), self.task_name)
-        readme_md_path = os.path.join(task_path, "README.md")
-        return readme_md_path
-    
-    def create_readme(self) -> dict:
-        """
-        创建README文件夹和README.md文件
-        """
-        return_results = {
-            "code": 1,
-            "message": ""
-        }
-        readme_md_path = self.gen_readme_path()
-        if not IOTools().check_target_file_exist(readme_md_path):
-            IOTools().create_file(readme_md_path)
-        return_results["code"] = 0
-        return_results["message"] = "Create README success."
-        return return_results
-    
-    def get_step_base_names(self) -> dict:
-        
-        config = ConfigTools()
-        source_folder_path = config.get_source_folder_path()
-        task_path = os.path.join(source_folder_path, self.task_name)
-        folder_names = IOTools().get_folder_names_from_path(task_path)
-        return_results = {
-            "return_value": 1,
-            "step_names": folder_names
-        }
         return return_results
     
     
