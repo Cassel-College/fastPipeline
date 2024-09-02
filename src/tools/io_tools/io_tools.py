@@ -71,7 +71,13 @@ class IOTools():
             return_value = -1
             massage += f", target file already exists!"
         else:
-            open(target_file_path, 'w').close()
+            try:
+                with open(target_file_path, 'w') as file:
+                    file.write("")
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                return_value = 1
+                massage += f", create failed!"
             if os.path.exists(target_file_path):
                 return_value = 0
                 massage += f", create success!"
