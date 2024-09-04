@@ -1,7 +1,11 @@
 #! /usr/bin/env python3
 
+class ReturnCode:
+    SUCCESS = 0
+    FAILED = 1
+
 class ReturnInfo:
-    def __init__(self, code: int, message: str, data: int):
+    def __init__(self, code: int, message: str, data: any):
         self.code = code
         self.message = message
         self.data = data
@@ -12,7 +16,7 @@ class ReturnInfo:
     def get_message(self) -> str:
         return self.message
     
-    def get_data(self) -> int:
+    def get_data(self):
         return self.data
     
     def get_return_info(self) -> dict:

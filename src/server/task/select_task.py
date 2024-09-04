@@ -2,6 +2,7 @@
 import os
 import sys
 
+from src.model.return_info import ReturnCode, ReturnInfo
 from src.tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 
@@ -21,24 +22,13 @@ from starlette.requests import Request
 
 router = APIRouter()
 
-def select_all_task_name_core() -> list:
 
-    config = ConfigTools()
-    source_folder_path = config.get_source_folder_path()
-    folder_names = IOTools().get_folder_names_from_path(source_folder_path)
-    return_results = {
-        "statusCode": 200,
-        "massage": "get task names success",
-        "data": folder_names,
-        "responseText": folder_names
-    }
-    return return_results
 
 @router.get("/select_all_task_name")
 def select_all_task_name_server(request: Request):
 
-    folder_names = select_all_task_name_core()
-    return JSONResponse(content=folder_names)
+    task_names = Task().select_all_task_name_core()
+    return JSONResponse(content=task_names)
 
 
 @router.get("/select_full_info_by_task_name")
