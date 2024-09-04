@@ -1,7 +1,7 @@
 import os
 
 
-from src.model.return_info import ReturnInfo
+from src.model.return_info import ReturnCode, ReturnInfo
 from src.tools.config_tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 from src.model.step import Step
@@ -248,3 +248,27 @@ class Task:
             log_info = f"Exec task of {self.task_name} success."
             print(log_info)
         return return_results
+    
+    def select_all_task_name_core() -> ReturnInfo:
+
+        config = ConfigTools()
+        source_folder_path = config.get_source_folder_path()
+        folder_names = IOTools().get_folder_names_from_path(source_folder_path)
+        return_info = ReturnInfo(ReturnCode.SUCCESS, "get task names success", folder_names)
+        return return_info
+    
+    def create(self) -> ReturnInfo:
+        """
+        创建任务
+        """
+        # # 1. create task folder
+        # create_task_folder_results = task.create_task_folder()
+        # # 2. create task readme file
+        # create_readme_results = task.create_readme()
+        # # 3. create task index file
+        # create_index_results = task.create_index()
+        # # 4. create task log file
+        # create_log_results = task.create_log()
+        # # 5. create task config file
+        # create_config_results = task.create_config()
+        pass

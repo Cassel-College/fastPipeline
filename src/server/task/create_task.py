@@ -10,12 +10,12 @@ from pydantic import BaseModel
 
 # import tools
 from src.model.log_model import LogModel
+from src.model.return_info import ReturnCode
 from src.model.task import Task
 from src.tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 
 # import other server
-from src.server.task.select_task import select_all_task_name_core
 from src.tools.log_tools.log_tools import LogTools
 
 # from pathlib import Path
@@ -41,18 +41,22 @@ def create(task_data: TaskCreate = Body(...)):
     task_name = task_data.task_name
     log_server.write_log(log=LogModel(f"create task: {task_name}", "INFO"))
     
+    task_names = Task().select_all_task_name_core()
+    if task_names.get("code", ReturnCode.FAILED) == ReturnCode.FAILED:
+        log_info = f"get old task names failed!"
+        print(log_info)
+        return {"code": ReturnCode.FAILED, "message": log_info, "resout": {}}
+    
+    if task_name in task_names.get("data", []):
+        log_info = f"task name: {task_name} already exists!"
+        print(log_info)
+        return {"code": ReturnCode.FAILED, "message": log_info, "resout": {}}
+    
     task = Task(task_name)
     task.init_for_create()
-    # # 1. create task folder
-    # create_task_folder_results = task.create_task_folder()
-    # # 2. create task readme file
-    # create_readme_results = task.create_readme()
-    # # 3. create task index file
-    # create_index_results = task.create_index()
-    # # 4. create task log file
-    # create_log_results = task.create_log()
-    # # 5. create task config file
-    # create_config_results = task.create_config()
+    return_info = task.create()
+    
+    
     
     config = ConfigTools()
     source_folder_path = config.get_source_folder_path()
