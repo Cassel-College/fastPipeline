@@ -50,6 +50,8 @@ def create(task_data: TaskCreate = Body(...)):
         log_info = f"task name: {task_name} already exists!"
         log_server.write_log(log=LogModel(log_info, "ERROR"))
         return {"code": ReturnCode.FAILED, "message": log_info, "resout": {}}
+    else:
+        log_server.write_log(log=LogModel(f"task name: {task_name} not exists! create task.", "INFO"))
     
     task = Task(task_name)
     task.init_for_create()

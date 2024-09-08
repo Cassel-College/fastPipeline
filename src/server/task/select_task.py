@@ -26,9 +26,9 @@ router = APIRouter()
 @router.get("/select_all_task_name")
 def select_all_task_name_server(request: Request):
 
-    task = Task("temp")
+    temp_task_name = "test001"
+    task = Task(task_name=temp_task_name)
     task_names = task.select_all_task_name_core()
-    # return JSONResponse(content=task_names.get_return_info())
     return task_names
 
 
