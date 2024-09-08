@@ -1,10 +1,12 @@
 import os
 
 
+from src.model.log_model import LogModel
 from src.model.return_info import ReturnCode, ReturnInfo
 from src.tools.config_tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
 from src.model.step import Step
+from src.tools.log_tools.log_tools import LogTools
 
 class Task:
     
@@ -14,6 +16,7 @@ class Task:
         self.paramater_path = ""
         self.log_path = ""
         self.config = ConfigTools()
+        self.log_tools = LogTools()
     
     def init_for_create(self):
         pass
@@ -75,7 +78,7 @@ class Task:
         else:
             for step_name in step_names:
                 if step_name not in step_index_names:
-                    log_info = f"Check task efficincy of {self.task_name} failed, step name {step_name} not in Step index."
+                    log_info = f"Check task:{self.task_name} efficincy failed, step name {step_name} not in Step index."
                     print(log_info)
                     task_efficincy["status"] = False
                     task_efficincy["message"] = log_info
@@ -249,26 +252,150 @@ class Task:
             print(log_info)
         return return_results
     
-    def select_all_task_name_core() -> ReturnInfo:
-
+    def select_all_task_name_core(self) -> ReturnInfo:
         config = ConfigTools()
         source_folder_path = config.get_source_folder_path()
         folder_names = IOTools().get_folder_names_from_path(source_folder_path)
-        return_info = ReturnInfo(ReturnCode.SUCCESS, "get task names success", folder_names)
+        return_info = ReturnInfo.create(ReturnCode.SUCCESS, "get task names success", {"folder_names": folder_names})
         return return_info
+
+    
+    def create_target_folder(self, name: str, task_name: str) -> ReturnInfo:
+        
+        return_results = ReturnInfo.create(ReturnCode.FAILED, f"create {name} failed", {})
+        log_info = f"create {name} of task:{task_name}."
+        log = LogModel(log_info, "INFO")
+        self.log_tools.write_log(log)
+        
+        io_tools = IOTools()
+        source_folder_path = self.config.get_source_folder_path()
+        task_dir = os.path.join(source_folder_path, task_name)
+        results = io_tools.create_target_folder(task_dir)
+        
+        if results.get_code() == 0:
+            log_info = f"create {name} success!"
+            return_results.set_code(ReturnCode.SUCCESS)
+            return_results.set_message(f"create {name} success")
+            return_results.set_data({f"{name}_path": task_dir})
+        elif results.get_code() == 1:
+            log_info = f"create {name} failed!" + results.get_message()
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(results.get_message())
+            return_results.set_data({})
+        elif results.get_code() == -1:
+            log_info = f"create {name} failed!" + results.get_message()
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(results.get_message())
+            return_results.set_data({})
+        else:
+            log_info = f"create {name} failed!" + results.get_message()
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(f"create {name} failed")
+            return_results.set_data({})
+        log = LogModel(log_info, "INFO")
+        self.log_tools.write_log(log)
+        return return_results
+    
+    def create_target_file(self, name: str, file_name: str) -> ReturnInfo:
+        
+        return_results = ReturnInfo.create(ReturnCode.FAILED, f"create task {name} failed", {})
+        log_info = f"create task {name} of {self.task_name}."
+        log = LogModel(log_info, "INFO")
+        self.log_tools.write_log(log)
+        io_tools = IOTools()
+        source_folder_path = self.config.get_source_folder_path()
+        task_dir = os.path.join(source_folder_path, self.task_name)
+        readme_md_path = os.path.join(task_dir, file_name)    
+        results = io_tools.create_target_file(readme_md_path)
+        if results.get_code() == ReturnCode.SUCCESS:
+            log_info = f"create task {name} success!"
+            return_results.set_code(ReturnCode.SUCCESS)
+            return_results.set_message(f"create task {name} success")
+            return_results.set_data({f"{name}_path": readme_md_path})
+        else:
+            log_info = f"create task {name} failed!"    
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(f"create task {name} failed")
+            return_results.set_data({})
+        log = LogModel(log_info, "INFO")
+        self.log_tools.write_log(log)
+        return return_results
+    
+    def create_task_folder(self) -> ReturnInfo:
+        
+        name = "task_folder"
+        task_name = self.task_name
+        return self.create_target_folder(name, task_name)
+    
+    def create_task_readme(self) -> ReturnInfo:
+        
+        name = "readme"
+        file_name = "README.md"
+        return self.create_target_file(name, file_name)
+    
+    def create_task_index(self) -> ReturnInfo:
+        
+        name = "task_index"
+        file_name = "index.json"
+        return self.create_target_file(name, file_name)
+    
+    def create_task_log(self) -> ReturnInfo:
+
+        name = "task_log"
+        file_name = "log.txt"
+        return self.create_target_file(name, file_name)
+    
+    def create_task_config(self) -> ReturnInfo:
+        
+        name = "task_config"
+        file_name = "config.json"
+        return self.create_target_file(name, file_name)
     
     def create(self) -> ReturnInfo:
         """
         创建任务
         """
-        # # 1. create task folder
-        # create_task_folder_results = task.create_task_folder()
-        # # 2. create task readme file
-        # create_readme_results = task.create_readme()
-        # # 3. create task index file
-        # create_index_results = task.create_index()
-        # # 4. create task log file
-        # create_log_results = task.create_log()
-        # # 5. create task config file
-        # create_config_results = task.create_config()
-        pass
+        return_results = ReturnInfo.create(ReturnCode.SUCCESS, "create task success", {})
+        
+        # 1. create task folder
+        create_task_folder_results = self.create_task_folder()
+        if create_task_folder_results.get_code() == ReturnCode.SUCCESS:
+            return_results = create_task_folder_results
+            return_results.add_data("task_folder_path", create_task_folder_results.get_data().get("task_dir", ""))
+        else:
+            return_results = ReturnInfo.create(ReturnCode.FAILED, "create task folder failed", {})
+            return return_results
+        
+        # 2. create task readme file
+        if create_task_folder_results.get_code() == ReturnCode.SUCCESS:
+            create_readme_results = self.create_task_readme()
+            return_results.add_data("readme_path", create_readme_results.get_data().get("readme_path", ""))
+        else:
+            create_readme_results = ReturnInfo.create(ReturnCode.FAILED, "create task folder failed", {})
+            return create_readme_results
+        
+        # 3. create task index file
+        if create_readme_results.get_code() == ReturnCode.SUCCESS:
+            create_index_results = self.create_task_index()
+            return_results.add_data("task_index_path", create_index_results.get_data().get("index_path", ""))
+        else:
+            create_index_results = ReturnInfo.create(ReturnCode.FAILED, "create readme failed", {})
+            return create_index_results
+        
+        # 4. create task log file
+        if create_index_results.get_code() == ReturnCode.SUCCESS:
+            create_log_results = self.create_task_log()
+            return_results.add_data("task_log_path", create_log_results.get_data().get("log_path", ""))
+        else:
+            create_log_results = ReturnInfo.create(ReturnCode.FAILED, "create index failed", {})
+            return create_log_results
+        
+        # 5. create task config file
+        if create_log_results.get_code() == ReturnCode.SUCCESS:
+            create_config_results = self.create_task_config()
+            return_results.add_data("task_config_path", create_config_results.get_data().get("config_path", ""))
+        else:
+            create_config_results = ReturnInfo.create(ReturnCode.FAILED, "create log failed", {})
+            return create_config_results
+        
+        return return_results

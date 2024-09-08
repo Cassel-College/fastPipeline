@@ -4,7 +4,7 @@ from src.tools.datatime_tools.datatime_tools import DatetimeTools
 
 
 class LogModel:
-    def __init__(self, log_info: str, level: str):
+    def __init__(self, log_info: str, level: str="INFO"):
         self.log_info = log_info
         self.level = level
         self.date_time = DatetimeTools().get_now_YYYY_MM_DD_HH_MM_SS()
