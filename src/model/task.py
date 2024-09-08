@@ -12,14 +12,13 @@ class Task:
     
     def __init__(self, task_name: str):
         self.task_name = task_name
+        self.task_dir = ""
         self.readme_path = ""
         self.paramater_path = ""
         self.log_path = ""
         self.config = ConfigTools()
         self.log_tools = LogTools()
     
-    def init_for_create(self):
-        pass
         
     def get_all_step_name(self) -> dict:
         
@@ -253,8 +252,13 @@ class Task:
         return return_results
     
     def select_all_task_name_core(self) -> ReturnInfo:
-        config = ConfigTools()
-        source_folder_path = config.get_source_folder_path()
+
+        log = LogModel(f"select all task name of {self.task_name}.", "INFO")
+        self.log_tools.write_log(log)
+
+        source_folder_path = self.config.get_source_folder_path()
+        self.log_tools.write_log(LogModel(f"get folder names from path: {source_folder_path}.", "INFO"))
+
         folder_names = IOTools().get_folder_names_from_path(source_folder_path)
         return_info = ReturnInfo.create(ReturnCode.SUCCESS, "get task names success", {"folder_names": folder_names})
         return return_info
@@ -351,6 +355,66 @@ class Task:
         file_name = "config.json"
         return self.create_target_file(name, file_name)
     
+    def gen_task_file_path(self, file_name: str, file_type: str) -> ReturnInfo:
+        task_dir = self.task_dir
+        file_path = os.path.join(task_dir, file_name)
+        setattr(self, f"{file_type}_path", file_path)
+        log = LogModel(f"gen task {file_type} path: {file_path}.", "INFO")
+        self.log_tools.write_log(log)
+        return_results = ReturnInfo.create(ReturnCode.SUCCESS, f"gen task {file_type} path success", {f"{file_type}_path": file_path})
+        return return_results
+
+    def gen_task_dir_path(self) -> ReturnInfo:
+        source_folder_path = self.config.get_source_folder_path()
+        task_dir = os.path.join(source_folder_path, self.task_name)
+        self.log_tools.write_log(LogModel(f"gen task dir: {task_dir}.", "INFO"))
+        self.task_dir = task_dir
+        return_results = ReturnInfo.create(ReturnCode.SUCCESS, "gen task dir success", {"task_dir": task_dir})
+        return return_results
+
+    def gen_task_readme_path(self) -> ReturnInfo:
+        return self.gen_task_file_path("README.md", "readme")
+
+    def gen_task_index_path(self) -> ReturnInfo:
+        return self.gen_task_file_path("index.json", "index")
+        
+    def gen_task_log_path(self) -> ReturnInfo:
+        return self.gen_task_file_path("log.txt", "log")
+    
+    def gen_task_paramater_path(self) -> ReturnInfo:
+        return self.gen_task_file_path("paramater.json", "paramater")
+    
+    def init_for_create(self):
+        results = ReturnInfo(code=ReturnCode.FAILED, message="init task failed.", data={})
+        
+        steps = [
+            ("dir", self.gen_task_dir_path),
+            ("readme", self.gen_task_readme_path),
+            ("index", self.gen_task_index_path),
+            ("log", self.gen_task_log_path),
+            ("parameter", self.gen_task_paramater_path)
+        ]
+        for step_name, step_function in steps:
+            step_result = step_function()
+            if step_result.code != ReturnCode.SUCCESS:
+                error_message = f"Gen task {step_name} path failed."
+                results.set_message(error_message)
+                self.log_tools.write_log(LogModel(error_message, "ERROR"))
+                return results
+        
+        results.set_code(ReturnCode.SUCCESS)
+        
+        results.add_data(key="log_path", value=f"{self.log_path}")
+        results.add_data(key="readme_path", value=f"{self.readme_path}")
+        results.add_data(key="index_path", value=f"{self.index_path}")
+        results.add_data(key="paramater_path", value=f"{self.paramater_path}")
+        results.add_data(key="task_dir", value=f"{self.task_dir}")
+
+        self.log_tools.write_log(LogModel("Init task success.", "INFO"))
+        print(self.__dict__)
+        return results
+
+
     def create(self) -> ReturnInfo:
         """
         创建任务
