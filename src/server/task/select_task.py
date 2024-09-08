@@ -23,12 +23,13 @@ from starlette.requests import Request
 router = APIRouter()
 
 
-
 @router.get("/select_all_task_name")
 def select_all_task_name_server(request: Request):
 
-    task_names = Task().select_all_task_name_core()
-    return JSONResponse(content=task_names)
+    task = Task("temp")
+    task_names = task.select_all_task_name_core()
+    # return JSONResponse(content=task_names.get_return_info())
+    return task_names
 
 
 @router.get("/select_full_info_by_task_name")
