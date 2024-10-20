@@ -3,9 +3,10 @@ import os
 import sys
 
 # import framework
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, Body,UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
+from pydantic import BaseModel
 
 # import tools
 from src.tools.config_tools import ConfigTools
@@ -27,12 +28,15 @@ from src.model.step import Step
 
 router = APIRouter()
 
+class StepCreate(BaseModel):
+    task_name: str
+    step_name: str
 
 @router.post("/create")
-def create(request: Request):
+def create(task_data: StepCreate = Body(...)):
 
-    task_name = "test001"
-    step_name = "index005"
+    task_name = task_data.task_name
+    step_name = task_data.step_name
     log_info = f"task name: {task_name} exists!"
     step = Step(task_name=task_name, step_name=step_name)
     print(step.to_dict())

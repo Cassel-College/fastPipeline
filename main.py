@@ -12,6 +12,7 @@ from src.server.task import create_task
 from src.server.task import exec_task
 from src.server.step import create_step
 from src.server.step import select_step
+from src.server.step import edit_step
 from src.tools.config_tools import ConfigTools
 import os
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,6 +32,7 @@ app.include_router(create_task.router, prefix="/api/v1/task")
 app.include_router(exec_task.router, prefix="/api/v1/task")
 app.include_router(create_step.router, prefix="/api/v1/step")
 app.include_router(select_step.router, prefix="/api/v1/step")
+app.include_router(edit_step.router, prefix="/api/v1/step")
 
 @app.get("/")
 async def root():

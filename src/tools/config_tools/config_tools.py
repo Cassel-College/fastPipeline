@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import json  # 添加这个导入
 
 
 class ConfigTools(object):
@@ -19,7 +20,7 @@ class ConfigTools(object):
             raise FileNotFoundError(f"config file: {self.config_file_path} not found!")
 
         with open(self.config_file_path, "r") as f:
-            config = eval(f.read())
+            config = json.load(f)  # 使用 json.load 代替 eval
 
         return config
     
@@ -64,3 +65,31 @@ class ConfigTools(object):
             self.config_dict = self.get_config()
         
         return self.config_dict.get("script_engine", "")
+    
+    def get_environment(self) -> str:
+
+        if self.config_dict is None:
+            self.config_dict = self.get_config()
+        
+        return self.config_dict.get("environment", "")
+
+    def get_dev_mode(self) -> dict:
+
+        if self.config_dict is None:
+            self.config_dict = self.get_config()
+        
+        return self.config_dict.get("dev_mode", {})
+
+    def get_dev_mode_open(self) -> bool:
+
+        if self.config_dict is None:
+            self.config_dict = self.get_config()
+        
+        return self.config_dict.get("dev_mode", {}).get("open", False)
+    
+    def get_dev_mode_print_log_in_terminal(self) -> bool:
+
+        if self.config_dict is None:
+            self.config_dict = self.get_config()
+        
+        return self.config_dict.get("dev_mode", {}).get("print_log_in_terminal", False)
