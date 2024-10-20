@@ -65,4 +65,9 @@ class LogTools:
         log_info = log.gen_log_info()
         with open(self.log_path, "a") as f:
             f.write(log_info + "\n")
+        config = ConfigTools()
+        environment = config.get_environment()
+        dev_mode = config.get_dev_mode()
+        if dev_mode["open"] and dev_mode["print_log_in_terminal"]:
+            print(log_info)
     

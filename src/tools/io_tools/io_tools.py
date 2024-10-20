@@ -4,7 +4,7 @@ import sys
 import json
 
 from src.model.log_model import LogModel
-from src.model.return_info import ReturnInfo
+from src.model.return_info import ReturnCode, ReturnInfo
 from src.tools.log_tools.log_tools import LogTools
 
 class IOTools():
@@ -131,3 +131,59 @@ class IOTools():
             return False
         else:
             return True
+        
+    
+    def read_target_file(self, target_file_path: str) -> ReturnInfo:
+        
+        log_server = LogTools()
+        
+        log_info = f"read target file path: {target_file_path}"
+        log_server.write_log(LogModel(log_info, "INFO"))
+        
+        return_results = ReturnInfo(code=1, message="", data=None)
+        
+        if not self.check_target_file_exist(target_file_path=target_file_path):
+            log_info = f"target file not exist: {target_file_path}"
+            log_server.write_log(LogModel(log_info, "INFO"))
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(f", target file not exist!")
+            return_results.set_data("")
+            return return_results
+        try:
+            with open(target_file_path, 'r') as file:
+                return_results.set_code(ReturnCode.SUCCESS)
+                return_results.set_message(f"read success!")
+                return_results.set_data(file.read())
+                log_info = f"read target file success: {target_file_path}"
+                log_server.write_log(LogModel(log_info, "INFO"))
+        except Exception as e:
+            log_info = f"read target file failed: {target_file_path}; Error occurred: {e} "
+            log_server.write_log(LogModel(log_info, "INFO"))
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(f"read failed!")
+            return_results.set_data("")
+        return return_results
+    
+        
+    def write_target_file(self, target_file_path: str, content: str) -> ReturnInfo:
+        
+        return_results = ReturnInfo(code=1, message="", data=None)
+        if not self.check_target_file_exist(target_file_path=target_file_path):
+            log_info = f"target file not exist: {target_file_path}"
+            self.log_tools.write_log(LogModel(log_info, "INFO"))
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(log_info)
+            return return_results
+        try:
+            with open(target_file_path, 'w') as file:
+                file.write(content)
+            log_info = f"write target file success: {target_file_path}"
+            self.log_tools.write_log(LogModel(log_info, "INFO"))
+            return_results.set_code(ReturnCode.SUCCESS)
+            return_results.set_message(f"Write file: {target_file_path} write success!")
+        except Exception as e:
+            log_info = f"write target file failed: {target_file_path}; Error occurred: {e} "
+            self.log_tools.write_log(LogModel(log_info, "INFO"))
+            return_results.set_code(ReturnCode.FAILED)
+            return_results.set_message(f"Write file: {target_file_path} write failed!")
+        return return_results

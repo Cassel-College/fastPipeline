@@ -4,5 +4,10 @@
     "input_file_name": "input.json",
     "output_file_name": "output.json",
     "step_log_file_name": "log.txt",
-    "script_engine": "python3"
+    "script_engine": "python3",
+    "environment": "dev",
+    "dev_mode": {
+        "open": true,
+        "print_log_in_terminal": true
+    }
 }

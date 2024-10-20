@@ -2,8 +2,11 @@
 import os
 import sys
 
+from src.model.log_model import LogModel
+from src.model.return_info import ReturnCode, ReturnInfo
 from src.tools.config_tools import ConfigTools
 from src.tools.io_tools.io_tools import IOTools
+from src.tools.log_tools.log_tools import LogTools
 
 class Step:
 
@@ -21,35 +24,35 @@ class Step:
     def create_step_in_work_folder(self) -> bool:
 
         create_status = True
-        if self.create_step_dir().get("create_status") != 0 or not create_status:
+        if self.create_step_dir().get_code() != 0 or not create_status:
             log_info = f"create step folder failed!"
             print(log_info)
             create_status = False
         else:
             log_info = f"create step folder success!"
             print(log_info)
-        if self.create_script_empty_file().get("create_status") != 0 or not create_status:
+        if self.create_script_empty_file().get_code() != 0 or not create_status:
             log_info = f"create step script failed!"
             print(log_info)
             create_status = False
         else:
             log_info = f"create step script success!"
             print(log_info)
-        if self.create_script_exec_input_file_path().get("create_status") != 0 or not create_status:
+        if self.create_script_exec_input_file_path().get_code() != 0 or not create_status:
             log_info = f"create step script exec input file path failed!"
             print(log_info)
             create_status = False
         else:
             log_info = f"create step script exec input file path success!"
             print(log_info)
-        if self.create_script_exec_output_file_path().get("create_status") != 0 or not create_status:
+        if self.create_script_exec_output_file_path().get_code() != 0 or not create_status:
             log_info = f"create step script exec output file path failed!"
             print(log_info)
             create_status = False
         else:
             log_info = f"create step script exec output file path success!"
             print(log_info)
-        if self.create_script_exec_log_file_path().get("create_status") != 0 or not create_status:
+        if self.create_script_exec_log_file_path().get_code() != 0 or not create_status:
             log_info = f"create step script exec log file path failed!"
             print(log_info)
             create_status = False
@@ -58,28 +61,31 @@ class Step:
             print(log_info)
         return create_status
     
-    def create_step_dir(self) -> dict:
+    def create_step_dir(self) -> ReturnInfo:
 
+        log_server = LogTools()
+        log_server.write_log(log=LogModel(f"create step dir of {self.task_name}:{self.step_name}.", "INFO"))
         source_folder_path = self.config.get_source_folder_path()
         step_folder_path = os.path.join(source_folder_path, self.task_name, self.step_name)
-        log_info = f"step folder path: {step_folder_path}"
-        print(log_info)
         self.step_folder_path = step_folder_path
         create_results = IOTools().create_target_folder(step_folder_path)
         return create_results
     
-    def create_script_empty_file(self) -> dict:
+    def create_script_empty_file(self) -> ReturnInfo:
 
+        log_server = LogTools()
+        log_server.write_log(log=LogModel(f"create step script of {self.task_name}:{self.step_name}.", "INFO"))
         source_folder_path = self.config.get_source_folder_path()
         abs_step_folder_path = os.path.join(source_folder_path, self.task_name, self.step_name)
         script_file_path = os.path.join(abs_step_folder_path, self.step_name + ".py")
         self.script_file_path = script_file_path
-        log_info = f"step file path: {script_file_path}"
         create_results = IOTools().create_target_file(script_file_path)
         return create_results
 
-    def create_script_exec_input_file_path(self) -> dict:
+    def create_script_exec_input_file_path(self) -> ReturnInfo:
 
+        log_server = LogTools()
+        log_server.write_log(log=LogModel(f"create step script exec input file path of {self.task_name}:{self.step_name}.", "INFO"))
         source_folder_path = self.config.get_source_folder_path()
         abs_step_folder_path = os.path.join(source_folder_path, self.task_name, self.step_name)
         script_exec_input_file_name = self.config.get_input_file_name()
@@ -89,8 +95,10 @@ class Step:
         create_results = IOTools().create_target_file(script_exec_input_file_path)
         return create_results
     
-    def create_script_exec_output_file_path(self) -> dict:
+    def create_script_exec_output_file_path(self) -> ReturnInfo:
 
+        log_server = LogTools()
+        log_server.write_log(log=LogModel(f"create step script exec output file path of {self.task_name}:{self.step_name}.", "INFO"))
         source_folder_path = self.config.get_source_folder_path()
         abs_step_folder_path = os.path.join(source_folder_path, self.task_name, self.step_name)
         script_exec_output_file_name = self.config.get_output_file_name()
@@ -100,8 +108,10 @@ class Step:
         create_results = IOTools().create_target_file(script_exec_output_file_path)
         return create_results
     
-    def create_script_exec_log_file_path(self) -> dict:
+    def create_script_exec_log_file_path(self) -> ReturnInfo:
 
+        log_server = LogTools()
+        log_server.write_log(log=LogModel(f"create step script exec log file path of {self.task_name}:{self.step_name}.", "INFO"))
         source_folder_path = self.config.get_source_folder_path()
         abs_step_folder_path = os.path.join(source_folder_path, self.task_name, self.step_name)
         script_exec_log_file_name = self.config.get_step_log_file_name()
@@ -183,16 +193,14 @@ class Step:
             init_status = False
         return init_status
     
-    def get_step_full_info(self) -> dict:
+    def get_step_full_info(self) -> ReturnInfo:
         
-        return_value = 1
+        result = ReturnInfo(code=1, message="", data=None)
         self.init_at_workspace()
-        step_full_info = self.to_dict()
-        return_results = {
-            "return_value": return_value,
-            "step_full_info": step_full_info
-        }
-        return return_results
+        result.set_code(ReturnCode.SUCCESS)
+        result.set_message("Get step full info success!")
+        result.set_data(self.to_dict())
+        return result
     
     def gen_exec_bash_command(self, step_full_info: dict) -> str:
         
@@ -236,3 +244,105 @@ class Step:
             return_results["return_value"] = 1
             return_results["message"] = f"Exec step bash command success!"
         return return_results
+    
+    def get_step_all_file_info(self) -> ReturnCode:
+        
+        results = ReturnInfo(code=ReturnCode.SUCCESS, message="Get step all file info success.", data={})
+        
+        log_server = LogTools()
+        log_info = f"Get Task {self.task_name} ; Step {self.step_name} all file info of {self.step_name}."
+        log_server.write_log(log=LogModel(log_info, "INFO"))
+        
+        self.init_at_workspace()
+        
+        step_files = {
+            "script_file_path": self.script_file_path,
+            "script_exec_input_file_path": self.script_exec_input_file_path,
+            "script_exec_output_file_path": self.script_exec_output_file_path,
+            "script_exec_log_file_path": self.script_exec_log_file_path
+        }
+        step_files_results = {}
+        for name, file_path in step_files.items():
+            one_file_info_result = {
+                "file_path": file_path,
+                "file_name": os.path.basename(file_path),
+                "file_dir": os.path.dirname(file_path),
+                "file_type": os.path.splitext(file_path)[1][1:],
+            }
+            file_info_result = IOTools().read_target_file(target_file_path=file_path)
+            if file_info_result.get_code() != ReturnCode.SUCCESS:
+                results.set_code(ReturnCode.FAILED)
+                results.set_message(file_info_result.get_message())
+                log_server.write_log(log=LogModel(file_info_result.get_message(), "ERROR"))
+            one_file_info_result["file_info_result"] = file_info_result
+            step_files_results[name] = one_file_info_result
+        results.set_data(step_files_results)
+        
+        return results
+        
+    def edit_step_file(self, path_name:str, file_path:str, file_info:str) -> ReturnInfo:
+        
+        results = ReturnInfo(code=ReturnCode.SUCCESS, message="Edit step file success.", data={})
+        
+        log_info = f"Edit step file of {self.task_name} and {self.step_name}."
+        log_server = LogTools()
+        log_server.write_log(log=LogModel(log_info, "INFO"))
+        
+        log_info = f"Get Step All file info of {self.step_name}."
+        log_server.write_log(log=LogModel(log_info, "INFO"))
+        
+        self.init_at_workspace()
+        step_files = {
+            "script_file_path": self.script_file_path,
+            "script_exec_input_file_path": self.script_exec_input_file_path,
+            "script_exec_output_file_path": self.script_exec_output_file_path,
+            "script_exec_log_file_path": self.script_exec_log_file_path
+        }
+        
+        if path_name not in step_files.keys():
+            log_info = f"Path name {path_name} is not in step files."
+            log_server.write_log(log=LogModel(log_info, "ERROR"))
+            results.set_code(ReturnCode.FAILED)
+            results.set_message(log_info)
+            return results
+        else:
+            log_info = f"Path name {path_name} is in step files."
+            log_server.write_log(log=LogModel(log_info, "INFO"))
+            
+            step_file_path = step_files.get(path_name, "")
+            
+            log_info = f"Begin edit file: {path_name} in step file: {step_file_path}..."
+            log_server.write_log(log=LogModel(log_info, "INFO"))
+            
+            log_info = f"Read Step All file info of {self.step_name}, file_path: {file_path}."
+            log_server.write_log(log=LogModel(log_info, "INFO"))
+            old_file_info_result = IOTools().read_target_file(target_file_path=file_path)
+            if old_file_info_result.get_code() != ReturnCode.SUCCESS:
+                results.set_code(ReturnCode.FAILED)
+                results.set_message(old_file_info_result.get_message())
+                log_server.write_log(log=LogModel(old_file_info_result.get_message(), "ERROR"))
+                return results
+            else:
+                log_info = f"Read step file: {path_name} in step file: {step_file_path} Success."
+                log_server.write_log(log=LogModel(log_info, "INFO"))
+                old_file_info_result.set_message(f"Edit file: {path_name} in step file: {step_file_path}.")
+                
+                log_info = f"Write step file: {path_name} in step file: {step_file_path}."
+                log_server.write_log(log=LogModel(log_info, "INFO"))
+                
+                new_file_info_result = IOTools().write_target_file(target_file_path=file_path, content=file_info)
+                if new_file_info_result.get_code() != ReturnCode.SUCCESS:
+                    log_info = f"Write step file: {path_name} in step file: {step_file_path} failed."
+                    log_server.write_log(log=LogModel(log_info, "ERROR"))
+                    results.set_code(ReturnCode.FAILED)
+                    results.set_message(new_file_info_result.get_message())
+                    return results
+                else:
+                    log_info = f"Write step file: {path_name} in step file: {step_file_path} success."
+                    log_server.write_log(log=LogModel(log_info, "INFO"))
+                    
+                    results.set_code(ReturnCode.SUCCESS)
+                    results.set_message(log_info)
+                    new_file_info_result = IOTools().read_target_file(target_file_path=file_path)
+                    results.set_data({"old_file_info_result": old_file_info_result, "new_file_info_result": new_file_info_result})
+        return results
