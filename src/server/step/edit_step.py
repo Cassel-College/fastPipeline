@@ -3,7 +3,7 @@ import os
 import sys
 
 # import framework
-from fastapi import APIRouter, Body,UploadFile, File, HTTPException
+from fastapi import APIRouter, Body, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 from pydantic import BaseModel
@@ -31,9 +31,11 @@ from src.tools.log_tools.log_tools import LogTools
 
 router = APIRouter()
 
+
 class StepEdit(BaseModel):
     task_name: str
     step_name: str
+    
     
 class StepEditFile(BaseModel):
     task_name: str
@@ -41,18 +43,7 @@ class StepEditFile(BaseModel):
     path_name: str
     file_path: str
     file_info: str
-
-# "script_file_path": {
-#       "file_path": "/Users/pengliu/Code/fastPipeline/source/demo_00123/step_001/step_001.py",
-#       "file_name": "step_001.py",
-#       "file_dir": "/Users/pengliu/Code/fastPipeline/source/demo_00123/step_001",
-#       "file_type": "py",
-#       "file_info_result": {
-#         "code": 0,
-#         "message": "read success!",
-#         "data": ""
-#       }
-#     },
+    
 
 @router.post("/edit_step")
 def edit(step_data: StepEditFile = Body(...)):
