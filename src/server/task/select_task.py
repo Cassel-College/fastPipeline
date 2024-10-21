@@ -9,8 +9,9 @@ from src.tools.io_tools.io_tools import IOTools
 from src.model.task import Task
 
 # import os
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, Body, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from pathlib import Path
 from starlette.requests import Request
@@ -31,35 +32,44 @@ def select_all_task_name_server(request: Request):
     task_names = task.select_all_task_name_core()
     return task_names
 
-
+class TaskName(BaseModel):
+    task_name: str
+    
 @router.get("/select_full_info_by_task_name")
-def select_all_task_name_server(request: Request):
-
-    task_name = "test001"
+def select_full_info_by_task_name(task_name: str):
     task_full_info = {}
     return_results = {}
     task = Task(task_name)
-    if task.check_task_exist():
-        task_full_info = task.get_task_full_info()
-        if task_full_info.get("return_value", 0) == 0:
-            return_results = {
-                "code": 1,
-                "massage": "get task full info success",
-                "data": task_full_info,
-            }
+    
+    try:
+        if task.check_task_exist():
+            task_full_info = task.get_task_full_info()
+            if task_full_info.get("return_value", 0) == 0:
+                return_results = {
+                    "code": 1,
+                    "massage": "get task full info success",
+                    "data": task_full_info,
+                }
+            else:
+                return_results = {
+                    "code": 0,
+                    "massage": "get task full info failed",
+                    "data": task_full_info
+                }
         else:
             return_results = {
                 "code": 0,
-                "massage": "get task full info failed",
+                "massage": "task not exist",
                 "data": task_full_info
             }
-    else:
+    except Exception as e:
         return_results = {
             "code": 0,
-            "massage": "task not exist",
-            "data": task_full_info
+            "massage": f"An error occurred: {str(e)}",
+            "data": {}
         }
-    return JSONResponse(content=return_results)
+    
+    return return_results
 
 
 @router.post("/select_all_step_name")
